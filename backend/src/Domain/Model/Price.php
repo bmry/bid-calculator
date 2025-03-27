@@ -4,6 +4,9 @@ namespace Progi\Domain\Model;
 
 use Progi\Domain\Exception\InvalidPriceException;
 
+/**
+ * Price is a Value Object ensuring the amount is always > 0.
+ */
 final class Price
 {
     private float $amount;

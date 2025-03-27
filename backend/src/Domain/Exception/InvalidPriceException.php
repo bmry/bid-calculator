@@ -4,6 +4,9 @@ namespace Progi\Domain\Exception;
 
 use DomainException;
 
+/**
+ * Thrown when someone tries to create a Price <= 0.
+ */
 class InvalidPriceException extends DomainException
 {
     public static function becausePriceMustBePositive(float $amount): self

@@ -2,22 +2,23 @@
 
 namespace Progi\Domain\Model;
 
+/**
+ * A collection of fee line items plus a total sum.
+ */
 final class FeeBreakdown
 {
-    /** @var FeeLineItem[] */
-    private array $items;
-    private float $total;
-
     /**
      * @param FeeLineItem[] $items
      */
-    public function __construct(array $items, float $total)
-    {
-        $this->items = $items;
-        $this->total = $total;
+    public function __construct(
+        private array $items,
+        private float $total
+    ) {
     }
 
-    /** @return FeeLineItem[] */
+    /**
+     * @return FeeLineItem[]
+     */
     public function items(): array
     {
         return $this->items;

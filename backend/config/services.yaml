@@ -22,3 +22,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    Progi\Domain\Repository\FeePolicyRepositoryInterface:
+        class: Progi\Infrastructure\Repository\YamlFeePolicyRepository
+        arguments:
+            $configPath: '%kernel.project_dir%/config/fee_policies.yaml'
