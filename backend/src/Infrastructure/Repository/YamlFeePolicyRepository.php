@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Progi\Infrastructure\Repository;
 
@@ -7,14 +8,14 @@ use Progi\Domain\Repository\FeePolicyRepositoryInterface;
 use Progi\Domain\Model\FeePolicy;
 
 /**
- * Loads fee policies from config/fee_policies.yaml at runtime.
+ * Retrieves fee policies from a YAML configuration file.
  */
 class YamlFeePolicyRepository implements FeePolicyRepositoryInterface
 {
     private array $policies;
 
     /**
-     * @param string $configPath e.g. %kernel.project_dir%/config/fee_policies.yaml
+     * @param string $configPath Path to fee_policies.yaml.
      */
     public function __construct(string $configPath)
     {
@@ -22,14 +23,15 @@ class YamlFeePolicyRepository implements FeePolicyRepositoryInterface
         $this->policies = $parsed ?? [];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findByVehicleType(string $vehicleType): ?FeePolicy
     {
-        // Lowercase to match keys in the YAML
         $vehicleType = strtolower($vehicleType);
         if (!isset($this->policies[$vehicleType])) {
             return null;
         }
-
         $data = $this->policies[$vehicleType];
         return new FeePolicy(
             baseFeeRate:      $data['basicFee']['baseRate'],

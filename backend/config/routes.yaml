@@ -1,5 +1,4 @@
-controllers:
-    resource:
-        path: ../src/Infrastructure/
-        namespace: Progi\Infrastructure\Controller
+controllers_v1:
+    resource: '../src/Infrastructure/Controller/V1/'
     type: attribute
+    prefix: /api/v1

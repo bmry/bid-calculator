@@ -1,15 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Progi\Domain\Model;
 
 /**
- * Holds the numeric rules for a given vehicle type.
+ * Contains fee parameters for a vehicle type.
+ *
+ * @param array<int, array{max: float, fee: float}> $associationTiers The tiers for association fees.
  */
 final class FeePolicy
 {
-    /**
-     * @param array<int, array{max: float, fee: float}> $associationTiers
-     */
     public function __construct(
         public float $baseFeeRate,
         public float $baseFeeMin,

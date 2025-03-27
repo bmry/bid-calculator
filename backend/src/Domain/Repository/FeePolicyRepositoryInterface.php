@@ -1,13 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Progi\Domain\Repository;
 
 use Progi\Domain\Model\FeePolicy;
 
-/**
- * A contract for loading FeePolicy data, e.g. from YAML, DB, or others.
- */
 interface FeePolicyRepositoryInterface
 {
+    /**
+     * Retrieves the FeePolicy for a given vehicle type.
+     *
+     * @param string $vehicleType
+     * @return FeePolicy|null Returns null if not found.
+     */
     public function findByVehicleType(string $vehicleType): ?FeePolicy;
 }

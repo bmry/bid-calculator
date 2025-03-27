@@ -3,26 +3,36 @@
 namespace Progi\Domain\Service;
 
 use Progi\Domain\Model\Price;
-use Progi\Domain\Model\FeeLineItem;
 use Progi\Domain\Model\FeeBreakdown;
+use Progi\Domain\Model\FeeLineItem;
 use Progi\Domain\Repository\FeePolicyRepositoryInterface;
 use Progi\Domain\Exception\PolicyNotFoundException;
 use Psr\Log\LoggerInterface;
 
 /**
- * Core domain service: calculates all fees for a given Price + vehicle type.
+ * Calculates fees for a given price and vehicle type.
  */
 class FeePolicyCalculator
 {
+    /**
+     * @param FeePolicyRepositoryInterface $repository Repository to fetch fee policies.
+     * @param LoggerInterface $logger PSR-3 logger instance.
+     */
     public function __construct(
         private FeePolicyRepositoryInterface $repository,
         private LoggerInterface $logger
-    ) {
-    }
+    ) {}
 
+    /**
+     * Calculates the fee breakdown.
+     *
+     * @param Price $price
+     * @param string $vehicleType
+     * @return FeeBreakdown
+     * @throws PolicyNotFoundException if no fee policy exists for the vehicle type.
+     */
     public function calculateFees(Price $price, string $vehicleType): FeeBreakdown
     {
-        // Attempt to load the FeePolicy from the repository
         $policy = $this->repository->findByVehicleType($vehicleType);
         if (!$policy) {
             $this->logger->warning("Fee policy not found for vehicle type=$vehicleType");
@@ -30,7 +40,6 @@ class FeePolicyCalculator
         }
 
         $priceValue = $price->toFloat();
-
 
         $basicFee = $priceValue * $policy->baseFeeRate;
         $basicFee = max($policy->baseFeeMin, min($basicFee, $policy->baseFeeMax));
@@ -41,20 +50,25 @@ class FeePolicyCalculator
 
         $storageFee = $policy->storageFee;
 
-        $items = [];
-        $items[] = new FeeLineItem("BasicBuyerFee", round($basicFee, 2));
-        $items[] = new FeeLineItem("SpecialFee", round($specialFee, 2));
-        $items[] = new FeeLineItem("AssociationFee", (float)$associationFee);
-        $items[] = new FeeLineItem("StorageFee", (float)$storageFee);
+        $items = [
+            new FeeLineItem("BasicBuyerFee", round($basicFee, 2)),
+            new FeeLineItem("SpecialFee", round($specialFee, 2)),
+            new FeeLineItem("AssociationFee", (float)$associationFee),
+            new FeeLineItem("StorageFee", (float)$storageFee)
+        ];
 
         $total = $priceValue + $basicFee + $specialFee + $associationFee + $storageFee;
-        $this->logger->info("Calculated fees for $vehicleType @ $priceValue => total=$total");
+        $this->logger->info("Calculated fees for $vehicleType with price $priceValue => total=$total");
 
         return new FeeBreakdown($items, round($total, 2));
     }
 
     /**
-     * Loops over the associationTiers to find the matching fee for a given price.
+     * Determines the association fee based on configured tiers.
+     *
+     * @param float $priceValue
+     * @param array<int, array{max: float, fee: float}> $tiers
+     * @return float
      */
     private function calcAssociationFee(float $priceValue, array $tiers): float
     {
@@ -63,7 +77,6 @@ class FeePolicyCalculator
                 return (float)$tier['fee'];
             }
         }
-
         throw new \RuntimeException("No association tier matched price=$priceValue");
     }
 }

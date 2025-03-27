@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Progi\Tests\Domain\Model;
 
@@ -6,9 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Progi\Domain\Model\Price;
 use Progi\Domain\Exception\InvalidPriceException;
 
-/**
- * Unit tests for the Price Value Object.
- */
 class PriceTest extends TestCase
 {
     public function testCanCreateValidPrice(): void
@@ -26,6 +24,6 @@ class PriceTest extends TestCase
     public function testNegativePriceThrows(): void
     {
         $this->expectException(InvalidPriceException::class);
-        Price::fromFloat(-50.0);
+        Price::fromFloat(-10.0);
     }
 }
