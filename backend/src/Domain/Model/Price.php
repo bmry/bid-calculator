@@ -1,8 +1,8 @@
 <?php
 
-namespace Prog\Domain\Model;
+namespace Progi\Domain\Model;
 
-use Prog\Domain\Exception\InvalidPriceException;
+use Progi\Domain\Exception\InvalidPriceException;
 
 final class Price
 {

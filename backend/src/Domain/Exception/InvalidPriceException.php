@@ -1,6 +1,6 @@
 <?php
 
-namespace Prog\Domain\Exception;
+namespace Progi\Domain\Exception;
 
 use DomainException;
 
