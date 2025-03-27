@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../src/Infrastructure/
+        namespace: Progi\Infrastructure\Controller
+    type: attribute
