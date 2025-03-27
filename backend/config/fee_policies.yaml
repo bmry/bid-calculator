@@ -1,0 +1,25 @@
+common:
+  basicFee:
+    baseRate: 0.1
+    min: 10
+    max: 50
+  specialFeeRate: 0.02
+  associationTiers:
+    - { max: 500,   fee: 5 }
+    - { max: 1000,  fee: 10 }
+    - { max: 3000,  fee: 15 }
+    - { max: 999999999, fee: 20 }
+  storageFee: 100
+
+luxury:
+  basicFee:
+    baseRate: 0.1
+    min: 25
+    max: 200
+  specialFeeRate: 0.04
+  associationTiers:
+    - { max: 500,   fee: 5 }
+    - { max: 1000,  fee: 10 }
+    - { max: 3000,  fee: 15 }
+    - { max: 999999999, fee: 20 }
+  storageFee: 100
