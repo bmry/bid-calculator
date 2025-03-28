@@ -24,9 +24,9 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist
 
-# ✅ Fix permissions for var/ (cache/logs)
-RUN chown -R www-data:www-data var \
-    && chmod -R 775 var
+## ✅ Fix permissions for var/ (cache/logs)
+#RUN chown -R www-data:www-data var \
+#    && chmod -R 775 var
 
 # Expose PHP-FPM port
 EXPOSE 9000
