@@ -7,28 +7,28 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
+    git \
     && docker-php-ext-install intl pdo_mysql zip
 
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files separately for cache
-COPY composer.json ./
-
-# Install Composer
+# Install Composer globally
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
-COPY composer.json composer.lock ./
+# Copy entire project
+COPY . .
 
-# Install PHP dependencies (production or dev)
+# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist
 
-# Copy project files (if you don't want to rely on volume)
-# For local development with volumes, you might skip this
-# COPY . /var/www/html
+# ✅ Fix permissions for var/ (cache/logs)
+RUN chown -R www-data:www-data var \
+    && chmod -R 775 var
 
-# Expose 9000 for PHP-FPM
+# Expose PHP-FPM port
 EXPOSE 9000
 
 CMD ["php-fpm"]
