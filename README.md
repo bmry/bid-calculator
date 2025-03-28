@@ -6,7 +6,7 @@ This tool uses a **Symfony (PHP 8.2)** backend and a **Vue 3** frontend, contain
 
 ---
 
-## 📦 Features
+## Features
 
 - Calculate real-time bid totals including:
     - Basic Buyer Fee (min/max capped)
@@ -23,7 +23,7 @@ This tool uses a **Symfony (PHP 8.2)** backend and a **Vue 3** frontend, contain
 
 ## 🚀 How to Start the Application
 
-> ✅ Make sure you have **Docker** and **Docker Compose** installed on your system.
+> Make sure you have **Docker** and **Docker Compose** installed on your system.
 
 ### 1. Clone the Repository
 
