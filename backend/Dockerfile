@@ -19,6 +19,8 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
+COPY composer.json composer.lock ./
+
 # Install PHP dependencies (production or dev)
 RUN composer install --no-interaction --prefer-dist
 

@@ -27,8 +27,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: vue_app
-    volumes:
-      - ./frontend:/app
+#    volumes:
+#      - ./frontend:/app
     ports:
       - "8080:80"
     depends_on:
