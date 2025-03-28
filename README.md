@@ -32,17 +32,7 @@ git clone git@github.com:bmry/bid-calculator.git
 cd bid-calculator
 ```
 
-### 2. Set Up Environment Variables
-
-Create a `.env` file inside the `frontend/` directory with:
-
-```bash
-VITE_API_URL=http://localhost:8081
-```
-
-This ensures the frontend connects to the backend correctly.
-
-### 3. Start the App
+### 2. Start the App
 
 To build and start all services (frontend, backend, nginx), run:
 
@@ -56,7 +46,7 @@ This will:
 - Set up PHP-FPM with Symfony
 - Serve everything using Nginx
 
-### 4. Access the App
+### 3. Access the App
 
 - **Frontend:** [http://localhost:8080](http://localhost:8080)
 - **API (v1):** [http://localhost:8081/api/v1/bid/calculate](http://localhost:8081/api/v1/bid/calculate)
@@ -98,7 +88,7 @@ docker-compose exec php-fpm bash
 php vendor/bin/phpunit
 ```
 
-## 🧰 Developer Notes
+## Developer Notes
 
 - **API versioning:** Routes are prefixed with `/api/v1`
 - **No hardcoded URLs:** Frontend uses `VITE_API_URL` from `.env`
