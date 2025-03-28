@@ -6,6 +6,8 @@ This tool uses a **Symfony (PHP 8.2)** backend and a **Vue 3** frontend, contain
 
 ---
 
+![Screenshot of the Bid Calculation Tool](doc/Calculator.png)
+
 ## Features
 
 - Calculate real-time bid totals including:
