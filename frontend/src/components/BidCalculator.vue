@@ -34,7 +34,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import axios from 'axios';
-import { debounce } from 'lodash-es'; // Using lodash-es for debounce (install via npm if needed)
+import { debounce } from 'lodash-es';
 
 export default defineComponent({
     name: 'BidCalculator',
@@ -43,14 +43,13 @@ export default defineComponent({
         const vehicleType = ref<string>('common');
         const fees = ref<null | { items: { name: string; amount: number }[]; total: number }>(null);
 
-        // Debounced API call to reduce excessive requests
         const calculateBidDebounced = debounce(async () => {
             if (!price.value) {
                 fees.value = null;
                 return;
             }
             try {
-                const apiUrl = import.meta.env.VITE_API_URL; // Read API host from env variable
+                const apiUrl = import.meta.env.VITE_API_URL;
                 const response = await axios.post(`${apiUrl}/api/v1/bid/calculate`, {
                     price: price.value,
                     type: vehicleType.value
@@ -62,7 +61,6 @@ export default defineComponent({
             }
         }, 300); // 300ms debounce delay
 
-        // Watchers trigger calculation automatically when price or vehicleType changes
         watch([price, vehicleType], () => {
             calculateBidDebounced();
         });
