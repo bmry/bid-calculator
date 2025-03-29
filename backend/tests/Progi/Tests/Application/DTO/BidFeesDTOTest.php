@@ -7,23 +7,27 @@ use PHPUnit\Framework\TestCase;
 use Progi\Application\DTO\BidFeesDTO;
 use Progi\Domain\Model\FeeBreakdown;
 use Progi\Domain\Model\FeeLineItem;
+use Money\Money;
+use Money\Currency;
 
+/**
+ * Unit tests for BidFeesDTO conversion.
+ */
 class BidFeesDTOTest extends TestCase
 {
     public function testFromFeeBreakdown(): void
     {
         $breakdown = new FeeBreakdown(
             items: [
-                new FeeLineItem("BasicBuyerFee", 50.0),
-                new FeeLineItem("SpecialFee", 20.0)
+                new FeeLineItem("BasicBuyerFee", new Money(3980, new Currency('CAD'))),
+                new FeeLineItem("SpecialFee", new Money(796, new Currency('CAD')))
             ],
-            total: 150.0
+            total: new Money(55076, new Currency('CAD'))
         );
         $dto = BidFeesDTO::fromFeeBreakdown($breakdown);
         $this->assertCount(2, $dto->items);
         $this->assertEquals("BasicBuyerFee", $dto->items[0]['name']);
-        // Verify the amounts are formatted as currency (e.g., "$50.00")
-        $this->assertEquals('$50.00', $dto->items[0]['amount']);
-        $this->assertEquals('$150.00', $dto->total);
+        $this->assertStringContainsString("39.80", $dto->items[0]['amount']);
+        $this->assertStringContainsString("550.76", $dto->total);
     }
 }

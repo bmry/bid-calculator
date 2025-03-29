@@ -5,11 +5,14 @@ namespace Progi\Application\DTO;
 
 use Progi\Domain\Model\FeeBreakdown;
 use Progi\Domain\Model\FeeLineItem;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\IntlMoneyFormatter;
+use NumberFormatter;
 
 /**
  * Data Transfer Object representing an itemized fee breakdown.
  *
- * All fee amounts and the total are formatted as currency strings (e.g., "$39.80").
+ * All fee amounts and the total are formatted as Canadian Dollar strings (e.g., "CA$550.76").
  */
 class BidFeesDTO
 {
@@ -20,34 +23,27 @@ class BidFeesDTO
     private function __construct() {}
 
     /**
-     * Creates a DTO from a FeeBreakdown, formatting amounts as currency.
+     * Creates a DTO from a FeeBreakdown.
      *
      * @param FeeBreakdown $breakdown
      * @return self
      */
     public static function fromFeeBreakdown(FeeBreakdown $breakdown): self
     {
+        $currencies = new ISOCurrencies();
+        $numberFormatter = new NumberFormatter('en_CA', NumberFormatter::CURRENCY);
+        $formatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+
         $dto = new self();
         $dto->items = array_map(
             fn(FeeLineItem $item) => [
-                'name' => $item->name,
-                'amount' => self::formatCurrency($item->amount)
+                'name' => $item->name(),
+                'amount' => $formatter->format($item->amount())
             ],
             $breakdown->items()
         );
-        $dto->total = self::formatCurrency($breakdown->total());
+        $dto->total = $formatter->format($breakdown->total());
         return $dto;
-    }
-
-    /**
-     * Formats a number as a currency string with a dollar symbol and 2 decimals.
-     *
-     * @param float $amount
-     * @return string
-     */
-    private static function formatCurrency(float $amount): string
-    {
-        return '$' . number_format($amount, 2, '.', '');
     }
 
     /**

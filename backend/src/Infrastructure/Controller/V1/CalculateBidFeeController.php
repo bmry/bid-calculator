@@ -12,15 +12,23 @@ use Progi\Application\UseCase\CalculateBidUseCase;
 use Progi\Domain\Exception\InvalidPriceException;
 use Progi\Domain\Exception\PolicyNotFoundException;
 
+/**
+ * Controller for calculating bid fees.
+ *
+ * Routes in this controller are automatically prefixed with /api/v1 via routes.yaml.
+ */
 #[Route('/bid/calculate', name: 'api_bid_calculate', methods: ['POST'])]
 class CalculateBidFeeController extends AbstractController
 {
+    /**
+     * @param LoggerInterface $logger Logger instance injected via DI.
+     */
     public function __construct(private LoggerInterface $logger)
     {
     }
 
     /**
-     * Handles a POST request to calculate bid fees.
+     * Handles POST requests to calculate bid fees.
      *
      * @param Request $request
      * @param CalculateBidUseCase $useCase

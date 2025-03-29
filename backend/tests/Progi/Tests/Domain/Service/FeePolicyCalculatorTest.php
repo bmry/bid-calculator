@@ -4,20 +4,25 @@ declare(strict_types=1);
 namespace Progi\Tests\Domain\Service;
 
 use PHPUnit\Framework\TestCase;
+use Progi\Domain\Exception\InvalidPriceException;
 use Progi\Domain\Service\FeePolicyCalculator;
 use Progi\Domain\Repository\FeePolicyRepositoryInterface;
 use Progi\Domain\Model\FeePolicy;
 use Progi\Domain\Model\Price;
 use Progi\Domain\Exception\PolicyNotFoundException;
 use Psr\Log\NullLogger;
+use Money\Money;
+use Money\Currency;
 
+/**
+ * Unit tests for FeePolicyCalculator covering both normal and error cases.
+ */
 class FeePolicyCalculatorTest extends TestCase
 {
     private FeePolicyCalculator $calc;
 
     protected function setUp(): void
     {
-        // Create a mock repository that returns a policy for "common" and null for others.
         $repo = $this->createMock(FeePolicyRepositoryInterface::class);
         $repo->method('findByVehicleType')->willReturnCallback(
             fn($type) => $type === 'common'
@@ -41,21 +46,20 @@ class FeePolicyCalculatorTest extends TestCase
 
     public function testCalculateCommon398(): void
     {
-        $price = Price::fromFloat(398);
+        $price = Price::fromFloat(398, 'CAD');
         $breakdown = $this->calc->calculateFees($price, 'common');
-        // Expected total: 398 + (398*0.1=39.8) + (398*0.02=7.96) + 5 + 100 = 550.76
-        $this->assertEquals(550.76, $breakdown->total());
+        $this->assertEquals(55076, $breakdown->total()->getAmount());
     }
 
     public function testZeroPriceThrows(): void
     {
-        $this->expectException(\Progi\Domain\Exception\InvalidPriceException::class);
-        $this->calc->calculateFees(Price::fromFloat(0), 'common');
+        $this->expectException(InvalidPriceException::class);
+        $this->calc->calculateFees(Price::fromFloat(0, 'CAD'), 'common');
     }
 
     public function testUnknownVehicleTypeThrows(): void
     {
         $this->expectException(PolicyNotFoundException::class);
-        $this->calc->calculateFees(Price::fromFloat(1000), 'luxury');
+        $this->calc->calculateFees(Price::fromFloat(1000, 'CAD'), 'luxury');
     }
 }

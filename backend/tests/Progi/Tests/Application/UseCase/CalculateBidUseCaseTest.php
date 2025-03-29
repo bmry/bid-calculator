@@ -9,6 +9,8 @@ use Progi\Domain\Service\FeePolicyCalculator;
 use Progi\Domain\Repository\FeePolicyRepositoryInterface;
 use Progi\Domain\Model\FeePolicy;
 use Psr\Log\NullLogger;
+use Money\Money;
+use Money\Currency;
 
 /**
  * Tests that CalculateBidUseCase returns a valid BidFeesDTO.
@@ -38,6 +40,6 @@ class CalculateBidUseCaseTest extends TestCase
 
         $dto = $useCase->execute(398, 'common');
         $this->assertNotEmpty($dto->items);
-        $this->assertEquals('$550.76', $dto->total);
+        $this->assertStringContainsString("550.76", $dto->total);
     }
 }

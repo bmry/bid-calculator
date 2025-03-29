@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Progi\Domain\Model;
 
+use Money\Money;
+
 /**
- * Represents an itemized fee breakdown including the total sum.
+ * Represents an itemized fee breakdown along with a total.
  *
  * @param FeeLineItem[] $items An array of fee line items.
  */
@@ -12,11 +14,11 @@ final class FeeBreakdown
 {
     /**
      * @param FeeLineItem[] $items
-     * @param float $total
+     * @param Money $total The total fee as a Money object.
      */
     public function __construct(
         private array $items,
-        private float $total
+        private Money $total
     ) {}
 
     /**
@@ -32,9 +34,9 @@ final class FeeBreakdown
     /**
      * Returns the total fee.
      *
-     * @return float
+     * @return Money
      */
-    public function total(): float
+    public function total(): Money
     {
         return $this->total;
     }

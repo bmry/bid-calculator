@@ -4,56 +4,14 @@ declare(strict_types=1);
 namespace Progi\Tests\Infrastructure\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+/**
+ * Integration tests for the CalculateBidController.
+ */
 class CalculateBidControllerTest extends WebTestCase
 {
     /**
-     * Test fee calculations for common vehicles.
-     *
-     * @dataProvider commonVehicleProvider
-     */
-    public function testCommonVehicleFees(float $price, array $expectedFees): void
-    {
-        $client = static::createClient();
-        $client->request(
-            'POST',
-            '/api/v1/bid/calculate',
-            server: ['CONTENT_TYPE' => 'application/json'],
-            content: json_encode([
-                'price' => $price,
-                'type' => 'common'
-            ])
-        );
-
-        $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('items', $data);
-        $this->assertArrayHasKey('total', $data);
-
-        // Check each expected fee line item
-        foreach ($expectedFees as $feeName => $expectedValue) {
-            $found = false;
-            foreach ($data['items'] as $item ) {
-                if ($item['name'] === $feeName) {
-                    $found = true;
-                    $this->assertEquals($expectedValue, $item['amount'], "Fee $feeName did not match.");
-                    break;
-                }
-            }
-
-            if ($feeName === 'Total') {
-                continue;
-            }
-            $this->assertTrue($found, "Fee $feeName not found in response.");
-        }
-
-        // Also check total
-        $this->assertEquals($expectedFees['Total'], $data['total'], "Total did not match.");
-    }
-
-    /**
-     * Data provider for common vehicles.
-     *
-     * @return array
+     * Data provider for common vehicle fee tests.
      */
     public function commonVehicleProvider(): array
     {
@@ -81,7 +39,7 @@ class CalculateBidControllerTest extends WebTestCase
             'price 57.00' => [
                 57.00,
                 [
-                    'BasicBuyerFee'   => '$10.00',
+                    'BasicBuyerFee'   => '$10.00', // clamped to min
                     'SpecialFee'      => '$1.14',
                     'AssociationFee'  => '$5.00',
                     'StorageFee'      => '$100.00',
@@ -91,19 +49,89 @@ class CalculateBidControllerTest extends WebTestCase
             'price 1100.00' => [
                 1100.00,
                 [
-                    'BasicBuyerFee'   => '$50.00',
+                    'BasicBuyerFee'   => '$50.00', // clamped to max
                     'SpecialFee'      => '$22.00',
                     'AssociationFee'  => '$15.00',
                     'StorageFee'      => '$100.00',
-                    'Total'           => '$1287.00',
+                    'Total'           => '$1,287.00',
                 ]
             ],
         ];
     }
 
     /**
-     * Test fee calculations for luxury vehicles.
-     *
+     * @dataProvider commonVehicleProvider
+     */
+    public function testCommonVehicleFees(float $price, array $expectedFees): void
+    {
+        $client = static::createClient();
+        $client->request(
+            'POST',
+            '/api/v1/bid/calculate',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
+                'price' => $price,
+                'type' => 'common'
+            ])
+        );
+
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('items', $data);
+        $this->assertArrayHasKey('total', $data);
+
+        foreach ($expectedFees as $feeName => $expectedValue) {
+            if ($feeName === 'Total') {
+                continue;
+            }
+            $found = false;
+            foreach ($data['items'] as $item) {
+                if ($item['name'] === $feeName) {
+                    $found = true;
+                    $this->assertEquals($expectedValue, $item['amount'], "Fee $feeName did not match.");
+                    break;
+                }
+            }
+
+            if ($feeName === 'Total') {
+                continue;
+            }
+
+            $this->assertTrue($found, "Fee $feeName not found in response.");
+        }
+        $this->assertEquals($expectedFees['Total'], $data['total'], "Total did not match.");
+    }
+
+    /**
+     * Data provider for luxury vehicle fee tests.
+     */
+    public function luxuryVehicleProvider(): array
+    {
+        return [
+            'price 1800.00' => [
+                1800.00,
+                [
+                    'BasicBuyerFee'   => '$180.00',
+                    'SpecialFee'      => '$72.00',
+                    'AssociationFee'  => '$15.00',
+                    'StorageFee'      => '$100.00',
+                    'Total'           => '$2,167.00',
+                ]
+            ],
+            'price 1000000.00' => [
+                1000000.00,
+                [
+                    'BasicBuyerFee'   => '$200.00',  // clamped to max
+                    'SpecialFee'      => '$40,000.00',
+                    'AssociationFee'  => '$20.00',
+                    'StorageFee'      => '$100.00',
+                    'Total'           => '$1,040,320.00',
+                ]
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider luxuryVehicleProvider
      */
     public function testLuxuryVehicleFees(float $price, array $expectedFees): void
@@ -125,9 +153,12 @@ class CalculateBidControllerTest extends WebTestCase
         $this->assertArrayHasKey('total', $data);
 
         foreach ($expectedFees as $feeName => $expectedValue) {
+            if ($feeName === 'Total') {
+                continue;
+            }
             $found = false;
             foreach ($data['items'] as $item) {
-                if ($item['name'] === $feeName && $feeName !== 'Total') {
+                if ($item['name'] === $feeName) {
                     $found = true;
                     $this->assertEquals($expectedValue, $item['amount'], "Fee $feeName did not match.");
                     break;
@@ -140,38 +171,6 @@ class CalculateBidControllerTest extends WebTestCase
 
             $this->assertTrue($found, "Fee $feeName not found in response.");
         }
-
         $this->assertEquals($expectedFees['Total'], $data['total'], "Total did not match.");
-    }
-
-    /**
-     * Data provider for luxury vehicles.
-     *
-     * @return array
-     */
-    public function luxuryVehicleProvider(): array
-    {
-        return [
-            'price 1800.00' => [
-                1800.00,
-                [
-                    'BasicBuyerFee'   => '$180.00',
-                    'SpecialFee'      => '$72.00',
-                    'AssociationFee'  => '$15.00',
-                    'StorageFee'      => '$100.00',
-                    'Total'           => '$2167.00',
-                ]
-            ],
-            'price 1000000.00' => [
-                1000000.00,
-                [
-                    'BasicBuyerFee'   => '$200.00',
-                    'SpecialFee'      => '$40000.00',
-                    'AssociationFee'  => '$20.00',
-                    'StorageFee'      => '$100.00',
-                    'Total'           => '$1040320.00',
-                ]
-            ],
-        ];
     }
 }

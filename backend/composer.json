@@ -8,7 +8,10 @@
     "symfony/flex": "^2.0",
     "symfony/yaml": "^6.0",
     "nelmio/cors-bundle": "^2.5",
-    "symfony/console": "^6.0"
+    "symfony/console": "^6.0",
+    "moneyphp/money": "^3.3",
+    "moneyphp/iso-currencies": "^3.5",
+    "ext-intl": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
