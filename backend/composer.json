@@ -11,7 +11,8 @@
     "symfony/console": "^6.0",
     "moneyphp/money": "^3.3",
     "moneyphp/iso-currencies": "^3.5",
-    "ext-intl": "*"
+    "ext-intl": "*",
+    "symfony/validator": "^6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

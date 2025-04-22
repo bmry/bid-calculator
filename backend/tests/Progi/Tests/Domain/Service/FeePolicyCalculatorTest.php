@@ -10,6 +10,11 @@ use Progi\Domain\Repository\FeePolicyRepositoryInterface;
 use Progi\Domain\Model\FeePolicy;
 use Progi\Domain\Model\Price;
 use Progi\Domain\Exception\PolicyNotFoundException;
+use Progi\Domain\Service\FeeCalculator\FeeCalculatorFactory;
+use Progi\Domain\Service\FeeCalculator\BasicFeeCalculator;
+use Progi\Domain\Service\FeeCalculator\SpecialFeeCalculator;
+use Progi\Domain\Service\FeeCalculator\AssociationFeeCalculator;
+use Progi\Domain\Service\FeeCalculator\StorageFeeCalculator;
 use Psr\Log\NullLogger;
 use Money\Money;
 use Money\Currency;
@@ -41,7 +46,15 @@ class FeePolicyCalculatorTest extends TestCase
                 )
                 : null
         );
-        $this->calc = new FeePolicyCalculator($repo, new NullLogger());
+
+        $factory = new FeeCalculatorFactory(
+            new BasicFeeCalculator(),
+            new SpecialFeeCalculator(),
+            new AssociationFeeCalculator(),
+            new StorageFeeCalculator()
+        );
+
+        $this->calc = new FeePolicyCalculator($repo, new NullLogger(), $factory);
     }
 
     public function testCalculateCommon398(): void

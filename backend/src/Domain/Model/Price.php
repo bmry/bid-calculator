@@ -6,6 +6,9 @@ namespace Progi\Domain\Model;
 use Progi\Domain\Exception\InvalidPriceException;
 use Money\Money;
 use Money\Currency;
+use Money\Formatter\IntlMoneyFormatter;
+use Money\Currencies\ISOCurrencies;
+use NumberFormatter;
 
 /**
  * Represents a price as a Money object.
@@ -49,5 +52,39 @@ final class Price
     public function asMoney(): Money
     {
         return $this->money;
+    }
+
+    /**
+     * Formats the price according to the specified locale.
+     *
+     * @param string $locale The locale to use for formatting (default: en_CA)
+     * @return string The formatted price
+     */
+    public function format(string $locale = 'en_CA'): string
+    {
+        $numberFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+        $currencies = new ISOCurrencies();
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+        return $moneyFormatter->format($this->money);
+    }
+
+    /**
+     * Returns the amount in dollars (not cents).
+     *
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return (float) $this->money->getAmount() / 100;
+    }
+
+    /**
+     * Returns the currency code.
+     *
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        return $this->money->getCurrency()->getCode();
     }
 }
